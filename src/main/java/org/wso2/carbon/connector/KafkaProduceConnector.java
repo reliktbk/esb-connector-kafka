@@ -487,13 +487,19 @@ public class KafkaProduceConnector extends AbstractConnector {
         Map<String, Object> propertiesMap = (((Axis2MessageContext) messageContext).getProperties());
         for (String keyValue : propertiesMap.keySet()) {
             if (keyValue.startsWith(key)) {
-                Value propertyValue = (Value) propertiesMap.get(keyValue);
-                headers.add(keyValue.substring(key.length()), propertyValue.
-                        evaluateValue(messageContext).getBytes());
+            	Object tmp = propertiesMap.get(keyValue);
+            	String propertyValue;
+            	if (tmp instanceof Value) {
+            		 propertyValue = ((Value) tmp).evaluateValue(messageContext);
+            	}
+            	else {
+            		 propertyValue = tmp.toString();
+            	}
+        		headers.add(keyValue.substring(key.length()), propertyValue.getBytes());
             }
         }
     }
-
+    
     private byte[] getSafeBytes(String value) {
         return value != null ? value.getBytes() : new byte[0];
     }
